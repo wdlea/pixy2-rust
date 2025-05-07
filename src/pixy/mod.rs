@@ -1,6 +1,7 @@
 use crate::version::Version;
 
 mod get_sync;
+mod recv_packet;
 
 pub struct Pixy2<Link> {
     pub version: Version,
@@ -10,4 +11,6 @@ pub struct Pixy2<Link> {
     pub link: Link,
 
     using_checksums: bool,
+
+    buf: [u8; 256],
 }
