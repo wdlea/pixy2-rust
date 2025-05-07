@@ -1,2 +1,3 @@
-mod link_type;
-mod version;
+pub mod link_type;
+pub mod pixy;
+pub mod version;

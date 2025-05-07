@@ -1,3 +1,3 @@
-use embedded_io::{Read, Write};
+use embedded_io::{Read, ReadReady, Write};
 
-pub trait LinkType: Write + Read {}
+pub trait LinkType: Write + Read + ReadReady {}
