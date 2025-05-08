@@ -4,8 +4,8 @@ use crate::link_type::LinkType;
 
 use super::Pixy2;
 
-const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16.to_le();
-const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16.to_le();
+const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;
+const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 
 pub enum SyncError<Link: LinkType> {
     NoSync,
@@ -28,7 +28,7 @@ impl<Link: LinkType> Pixy2<Link> {
                     .read_exact(buf.as_mut_slice())
                     .map_err(|e| SyncError::ReadError(e))?;
 
-                let current = buf[0].to_le() as u16;
+                let current = buf[0] as u16;
 
                 let start: u16 = (current << 8) | (prev as u16);
                 if start == PIXY_CHECKSUM_SYNC {

@@ -18,8 +18,8 @@ impl<Link: LinkType> Pixy2<Link> {
             .read_exact(&mut self.buf[0..2])
             .map_err(|e| RecvError::ReadError(e))?;
 
-        let message_type = self.buf[0].to_le();
-        let message_length = self.buf[1].to_le();
+        let message_type = self.buf[0];
+        let message_length = self.buf[1];
 
         let buf;
 
@@ -35,8 +35,6 @@ impl<Link: LinkType> Pixy2<Link> {
             self.link
                 .read_exact(buf)
                 .map_err(|e| RecvError::ReadError(e))?;
-
-            buf.iter_mut().for_each(|i| *i = i.to_le()); // convert everything to le
 
             let checksum_calculation: u16 = buf.iter().map(|i| *i as u16).sum();
 
