@@ -18,8 +18,8 @@ impl<Link: LinkType> Pixy2<Link> {
             .read_exact(&mut self.buf[0..2])
             .map_err(|e| RecvError::ReadError(e))?;
 
-        let message_type = self.buf[0];
-        let message_length = self.buf[1];
+        let message_type = self.buf[0].to_le(); // this will convert from le to native endianness as it flips the order 
+        let message_length = self.buf[1].to_le();
 
         let buf;
 
@@ -28,7 +28,7 @@ impl<Link: LinkType> Pixy2<Link> {
                 .read_exact(&mut self.buf[0..2])
                 .map_err(|e| RecvError::ReadError(e))?;
 
-            let message_checksum: u16 = unsafe { *self.buf[0..2].as_ptr().cast() };
+            let message_checksum: u16 = unsafe { *self.buf[0..2].as_ptr().cast::<u16>() }.to_le();
 
             buf = &mut self.buf[..(message_length as usize)];
 
@@ -36,7 +36,7 @@ impl<Link: LinkType> Pixy2<Link> {
                 .read_exact(buf)
                 .map_err(|e| RecvError::ReadError(e))?;
 
-            let checksum_calculation: u16 = buf.iter().map(|i| *i as u16).sum();
+            let checksum_calculation: u16 = buf.iter().map(|i| i.to_le() as u16).sum();
 
             if message_checksum != checksum_calculation {
                 return Err(RecvError::InvalidChecksum);
