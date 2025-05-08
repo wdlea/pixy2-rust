@@ -5,7 +5,7 @@ use crate::link_type::LinkType;
 use super::Pixy2;
 
 const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;
-const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
+pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 
 pub enum SyncError<Link: LinkType> {
     NoSync,

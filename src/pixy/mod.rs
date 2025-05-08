@@ -2,6 +2,7 @@ use crate::version::Version;
 
 mod get_sync;
 mod recv_packet;
+mod send_packet;
 
 pub struct Pixy2<Link> {
     pub version: Version,
