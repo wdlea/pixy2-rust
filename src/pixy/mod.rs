@@ -4,6 +4,7 @@ use operation_error::OperationError;
 
 use crate::{link_type::LinkType, version::Version};
 
+mod change_program;
 mod get_resolution;
 mod get_sync;
 mod get_version;
