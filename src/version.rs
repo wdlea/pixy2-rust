@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 #[repr(C)]
+#[derive(Clone)]
 pub struct Version {
     pub hardware: u16,
     pub firmware_major: u8,

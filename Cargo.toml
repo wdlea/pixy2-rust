@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 embedded-io = "0.6.1"
+embedded-time = "0.12.1"

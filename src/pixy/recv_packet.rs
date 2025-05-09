@@ -49,6 +49,8 @@ impl<Link: LinkType> Pixy2<Link> {
                 .map_err(|e| RecvError::ReadError(e))?;
         }
 
+        buf.iter_mut().for_each(|i| *i = i.to_le());
+
         Ok((message_type, buf))
     }
 }
