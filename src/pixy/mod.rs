@@ -1,7 +1,10 @@
-use embedded_time::{Clock, clock, duration::Milliseconds};
+use embedded_hal::delay::DelayNs;
+use embedded_time::{Clock, duration::Milliseconds};
+use operation_error::OperationError;
 
 use crate::{link_type::LinkType, version::Version};
 
+mod get_resolution;
 mod get_sync;
 mod get_version;
 mod operation_error;
@@ -19,7 +22,11 @@ pub struct Pixy2<Link> {
 }
 
 impl<Link: LinkType> Pixy2<Link> {
-    pub fn new(link: Link, clock: impl Clock) -> Result<Self, clock::Error> {
+    pub fn new(
+        link: Link,
+        clock: impl Clock,
+        waiter: &mut impl DelayNs,
+    ) -> Result<Self, OperationError<Link>> {
         let mut me = Self {
             version: None,
             frame_width: None,
@@ -28,15 +35,17 @@ impl<Link: LinkType> Pixy2<Link> {
             using_checksums: false,
             buf: [0; 256],
         };
-        let start_time = clock.try_now()?;
+        let start_time = clock.try_now().map_err(|e| OperationError::ClockError(e))?;
         let end_time = start_time + Milliseconds(5_000);
 
-        while clock.try_now()? < end_time {
+        while clock.try_now().map_err(|e| OperationError::ClockError(e))? < end_time {
             if me.get_version().is_ok() {
-                todo!("Get res");
+                me.get_resolution()?;
+                return Ok(me);
             }
+            waiter.delay_us(5_000);
         }
 
-        todo!()
+        Err(OperationError::Timeout)
     }
 }
