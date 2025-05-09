@@ -1,6 +1,5 @@
 use embedded_hal::delay::DelayNs;
 use embedded_time::{Clock, duration::Milliseconds};
-use operation_error::OperationError;
 
 use crate::{link_type::LinkType, version::Version};
 
@@ -14,6 +13,7 @@ mod recv_packet;
 mod send_packet;
 
 pub use get_blocks::Block;
+pub use operation_error::OperationError;
 
 /// Represents a Pixy2 camera
 pub struct Pixy2<Link> {
