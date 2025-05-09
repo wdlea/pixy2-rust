@@ -5,12 +5,15 @@ use operation_error::OperationError;
 use crate::{link_type::LinkType, version::Version};
 
 mod change_program;
+mod get_blocks;
 mod get_resolution;
 mod get_sync;
 mod get_version;
 mod operation_error;
 mod recv_packet;
 mod send_packet;
+
+pub use get_blocks::Block;
 
 pub struct Pixy2<Link> {
     pub version: Option<Version>,

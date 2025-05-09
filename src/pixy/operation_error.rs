@@ -14,5 +14,8 @@ pub enum OperationError<Link: LinkType> {
     ClockError(clock::Error),
     IOError(io::Error),
 
+    PixyError(i8),
+
     Timeout,
+    Busy,
 }
