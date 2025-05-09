@@ -10,6 +10,10 @@ const REQUEST_CHANGE_PROGRAM: u8 = 0x02;
 const MAX_PROGRAM_NAME_LENGTH: u8 = 33;
 
 impl<Link: LinkType> Pixy2<Link> {
+    /// Changes the program currently running on pixycam.
+    /// I ported this not knowing what it does, there are
+    /// no docs explaining what strings you should feed
+    /// into `prog`.
     pub fn change_program(
         &mut self,
         prog: &str,
