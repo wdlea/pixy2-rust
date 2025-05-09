@@ -1,4 +1,6 @@
-use std::fmt::Display;
+use core::str;
+
+use ufmt::{uDisplay, uwrite};
 
 #[repr(C)]
 #[derive(Clone)]
@@ -8,19 +10,22 @@ pub struct Version {
     pub firmware_minor: u8,
     pub firmware_build: u16,
 
-    pub firmware_type: [char; 10],
+    pub firmware_type: [u8; 10],
 }
 
-impl Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
+impl uDisplay for Version {
+    fn fmt<W>(&self, w: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
+    where
+        W: ufmt::uWrite + ?Sized,
+    {
+        uwrite!(
+            w,
             "Hardware Version: {}, Firmware Version: {}.{}.{} {}",
             self.hardware,
             self.firmware_major,
             self.firmware_minor,
             self.firmware_build,
-            String::from_iter(self.firmware_type.iter())
+            str::from_utf8(self.firmware_type.as_slice()).unwrap()
         )
     }
 }

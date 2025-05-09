@@ -1,5 +1,4 @@
-use std::io;
-
+use embedded_io::SliceWriteError;
 use embedded_time::clock;
 
 use crate::link_type::LinkType;
@@ -13,7 +12,7 @@ pub enum OperationError<Link: LinkType> {
 
     UnexpectedPacket { got: u8, expected: u8 },
     ClockError(clock::Error),
-    IOError(io::Error),
+    IOError(SliceWriteError),
 
     PixyError(i8),
 

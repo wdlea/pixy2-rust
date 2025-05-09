@@ -1,6 +1,5 @@
-use std::io::Write;
-
 use embedded_hal::delay::DelayNs;
+use embedded_io::Write;
 
 use crate::link_type::LinkType;
 
