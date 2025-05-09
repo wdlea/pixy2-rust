@@ -15,9 +15,13 @@ mod send_packet;
 
 pub use get_blocks::Block;
 
+/// Represents a Pixy2 camera
 pub struct Pixy2<Link> {
+    /// The version of this camera, if it has been fetched
     pub version: Option<Version>,
+    /// The width (in pixels) of the camera
     pub frame_width: Option<u16>,
+    /// The height (in pixels) of the camera
     pub frame_height: Option<u16>,
 
     link: Link,
