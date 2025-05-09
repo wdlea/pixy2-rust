@@ -26,6 +26,7 @@ pub struct Pixy2<Link> {
 }
 
 impl<Link: LinkType> Pixy2<Link> {
+    /// Create an initialize a Pixy2 object.
     pub fn new(
         link: Link,
         clock: impl Clock,

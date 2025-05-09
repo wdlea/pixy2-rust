@@ -6,6 +6,7 @@ pub const REQUEST_PIXY_VERSION: u8 = 0x0e;
 pub const RESPONSE_PIXY_VERSION: u8 = 0x0f;
 
 impl<Link: LinkType> Pixy2<Link> {
+    /// Requests the camera's version.
     pub fn get_version(&mut self) -> Result<&Version, OperationError<Link>> {
         self.send_packet(REQUEST_PIXY_VERSION, &[])
             .map_err(|e| OperationError::<Link>::SendError(e))?;

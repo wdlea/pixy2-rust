@@ -11,6 +11,7 @@ pub enum RecvError<Link: LinkType> {
 }
 
 impl<Link: LinkType> Pixy2<Link> {
+    /// Recieve the next packet that the camera sends
     pub fn recv_packet(&mut self) -> Result<(u8, &mut [u8]), RecvError<Link>> {
         self.get_sync().map_err(|e| RecvError::SyncError(e))?;
 
