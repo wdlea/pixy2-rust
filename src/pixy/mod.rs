@@ -1,5 +1,4 @@
 use embedded_hal::delay::DelayNs;
-use embedded_time::{Clock, duration::Milliseconds};
 
 use crate::{link_type::LinkType, version::Version};
 
@@ -31,11 +30,7 @@ pub struct Pixy2<Link> {
 
 impl<Link: LinkType> Pixy2<Link> {
     /// Create an initialize a Pixy2 object.
-    pub fn new(
-        link: Link,
-        clock: impl Clock,
-        waiter: &mut impl DelayNs,
-    ) -> Result<Self, OperationError<Link>> {
+    pub fn new(link: Link, waiter: &mut impl DelayNs) -> Result<Self, OperationError<Link>> {
         let mut me = Self {
             version: None,
             frame_width: None,
@@ -44,15 +39,16 @@ impl<Link: LinkType> Pixy2<Link> {
             using_checksums: false,
             buf: [0; 256],
         };
-        let start_time = clock.try_now().map_err(|e| OperationError::ClockError(e))?;
-        let end_time = start_time + Milliseconds(5_000);
+        let mut i = 0;
 
-        while clock.try_now().map_err(|e| OperationError::ClockError(e))? < end_time {
+        while i < 1000 {
+            // delay for at most 5_000_000 us (5 seconds)
             if me.get_version().is_ok() {
                 me.get_resolution()?;
                 return Ok(me);
             }
             waiter.delay_us(5_000);
+            i += 1;
         }
 
         Err(OperationError::Timeout)
