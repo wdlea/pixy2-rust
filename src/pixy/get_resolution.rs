@@ -1,12 +1,12 @@
-use crate::link_type::LinkType;
+use embedded_io::{Read, ReadReady, Write};
 
 use super::{Pixy2, operation_error::OperationError};
 
 const REQUEST_PIXY_RESOLOUTION: u8 = 0x0c;
 const RESPONSE_PIXY_RESOLOUTION: u8 = 0x0d;
 
-impl<Link: LinkType> Pixy2<Link> {
-    /// Returns the resoloution of the camera in pixels.
+impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+    /// Returns the resolution of the camera in pixels.
     pub fn get_resolution(&mut self) -> Result<(u16, u16), OperationError<Link>> {
         self.send_packet(REQUEST_PIXY_RESOLOUTION, &[0])
             .map_err(|e| OperationError::SendError(e))?;

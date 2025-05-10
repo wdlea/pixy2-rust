@@ -1,8 +1,8 @@
-use crate::link_type::LinkType;
+use embedded_io::{Read, ReadReady, Write};
 
 use super::{Pixy2, get_sync::PIXY_NO_CHECKSUM_SYNC};
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: Write + Read + ReadReady> Pixy2<Link> {
     /// Send a packed with a type and a payload.
     /// This uses the length of the slice for message
     /// length.

@@ -1,16 +1,14 @@
-use embedded_io::ReadExactError;
-
-use crate::link_type::LinkType;
+use embedded_io::{Read, ReadExactError, ReadReady, Write};
 
 use super::{Pixy2, get_sync::SyncError};
 
-pub enum RecvError<Link: LinkType> {
+pub enum RecvError<Link: Write + Read + ReadReady> {
     SyncError(SyncError<Link>),
     ReadError(ReadExactError<Link::Error>),
     InvalidChecksum,
 }
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: Write + Read + ReadReady> Pixy2<Link> {
     /// Receive the next packet that the camera sends
     pub fn recv_packet(&mut self) -> Result<(u8, &mut [u8]), RecvError<Link>> {
         self.get_sync().map_err(|e| RecvError::SyncError(e))?;

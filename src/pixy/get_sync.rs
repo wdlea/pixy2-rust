@@ -1,19 +1,17 @@
-use embedded_io::ReadExactError;
-
-use crate::link_type::LinkType;
+use embedded_io::{Read, ReadExactError, ReadReady, Write};
 
 use super::Pixy2;
 
 const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;
 pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 
-pub enum SyncError<Link: LinkType> {
+pub enum SyncError<Link: Read> {
     NoSync,
     ReadError(ReadExactError<Link::Error>),
 }
 
-impl<Link: LinkType> Pixy2<Link> {
-    /// Waits until a sync sequence is recieved from the camera.
+impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+    /// Waits until a sync sequence is received from the camera.
     pub fn get_sync(&mut self) -> Result<(), SyncError<Link>> {
         let mut prev = 0u8;
         let mut i = 0;

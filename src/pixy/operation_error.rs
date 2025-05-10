@@ -1,12 +1,10 @@
-use embedded_io::SliceWriteError;
+use embedded_io::{Read, ReadReady, SliceWriteError, Write};
 use embedded_time::clock;
-
-use crate::link_type::LinkType;
 
 use super::recv_packet::RecvError;
 
 /// Errors which can arise from any operation
-pub enum OperationError<Link: LinkType> {
+pub enum OperationError<Link: Read + Write + ReadReady> {
     /// An error raised while sending a packet
     SendError(Link::Error),
     /// An error raised when receiving a packet
