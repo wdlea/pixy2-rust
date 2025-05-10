@@ -1,12 +1,23 @@
+use core::fmt::Debug;
+
 use crate::link_type::LinkType;
 
 use super::{Pixy2, get_sync::SyncError};
 
-#[derive(Debug)]
 pub enum RecvError<Link: LinkType> {
     SyncError(SyncError<Link>),
     ReadError(Link::ReadError),
     InvalidChecksum,
+}
+
+impl<Link: LinkType> Debug for RecvError<Link> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SyncError(arg0) => f.debug_tuple("SyncError").field(arg0).finish(),
+            Self::ReadError(arg0) => f.debug_tuple("ReadError").field(arg0).finish(),
+            Self::InvalidChecksum => write!(f, "InvalidChecksum"),
+        }
+    }
 }
 
 impl<Link: LinkType> Pixy2<Link> {

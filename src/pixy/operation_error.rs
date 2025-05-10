@@ -1,3 +1,5 @@
+use core::fmt::Debug;
+
 use embedded_io::SliceWriteError;
 use embedded_time::clock;
 
@@ -6,7 +8,6 @@ use crate::link_type::LinkType;
 use super::recv_packet::RecvError;
 
 /// Errors which can arise from any operation
-#[derive(Debug)]
 pub enum OperationError<Link: LinkType> {
     /// An error raised while sending a packet
     SendError(Link::WriteError),
@@ -32,4 +33,23 @@ pub enum OperationError<Link: LinkType> {
     Timeout,
     /// The Pixy2 camera has bigger fish to fry
     Busy,
+}
+
+impl<Link: LinkType> Debug for OperationError<Link> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SendError(arg0) => f.debug_tuple("SendError").field(arg0).finish(),
+            Self::RecvError(arg0) => f.debug_tuple("RecvError").field(arg0).finish(),
+            Self::UnexpectedPacket { got, expected } => f
+                .debug_struct("UnexpectedPacket")
+                .field("got", got)
+                .field("expected", expected)
+                .finish(),
+            Self::ClockError(arg0) => f.debug_tuple("ClockError").field(arg0).finish(),
+            Self::IOError(arg0) => f.debug_tuple("IOError").field(arg0).finish(),
+            Self::PixyError(arg0) => f.debug_tuple("PixyError").field(arg0).finish(),
+            Self::Timeout => write!(f, "Timeout"),
+            Self::Busy => write!(f, "Busy"),
+        }
+    }
 }

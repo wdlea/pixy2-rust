@@ -1,3 +1,5 @@
+use core::fmt::Debug;
+
 use crate::link_type::LinkType;
 
 use super::Pixy2;
@@ -5,10 +7,18 @@ use super::Pixy2;
 const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;
 pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 
-#[derive(Debug)]
 pub enum SyncError<Link: LinkType> {
     NoSync,
     ReadError(Link::ReadError),
+}
+
+impl<Link: LinkType> Debug for SyncError<Link> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NoSync => write!(f, "NoSync"),
+            Self::ReadError(arg0) => f.debug_tuple("ReadError").field(arg0).finish(),
+        }
+    }
 }
 
 impl<Link: LinkType> Pixy2<Link> {
