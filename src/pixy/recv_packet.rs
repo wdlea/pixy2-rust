@@ -1,20 +1,20 @@
-use embedded_io::{Read, ReadExactError, ReadReady, Write};
+use crate::link_type::LinkType;
 
 use super::{Pixy2, get_sync::SyncError};
 
-pub enum RecvError<Link: Write + Read + ReadReady> {
+pub enum RecvError<Link: LinkType> {
     SyncError(SyncError<Link>),
-    ReadError(ReadExactError<Link::Error>),
+    ReadError(Link::ReadError),
     InvalidChecksum,
 }
 
-impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+impl<Link: LinkType> Pixy2<Link> {
     /// Receive the next packet that the camera sends
     pub fn recv_packet(&mut self) -> Result<(u8, &mut [u8]), RecvError<Link>> {
         self.get_sync().map_err(|e| RecvError::SyncError(e))?;
 
         self.link
-            .read_exact(&mut self.buf[0..2])
+            .read(&mut self.buf[0..2])
             .map_err(|e| RecvError::ReadError(e))?;
 
         let message_type = self.buf[0].to_le(); // this will convert from le to native endianness as it flips the order 
@@ -24,16 +24,14 @@ impl<Link: Write + Read + ReadReady> Pixy2<Link> {
 
         if self.using_checksums {
             self.link
-                .read_exact(&mut self.buf[0..2])
+                .read(&mut self.buf[0..2])
                 .map_err(|e| RecvError::ReadError(e))?;
 
             let message_checksum: u16 = unsafe { *self.buf[0..2].as_ptr().cast::<u16>() }.to_le();
 
             buf = &mut self.buf[..(message_length as usize)];
 
-            self.link
-                .read_exact(buf)
-                .map_err(|e| RecvError::ReadError(e))?;
+            self.link.read(buf).map_err(|e| RecvError::ReadError(e))?;
 
             let checksum_calculation: u16 = buf.iter().map(|i| i.to_le() as u16).sum();
 
@@ -43,9 +41,7 @@ impl<Link: Write + Read + ReadReady> Pixy2<Link> {
         } else {
             buf = &mut self.buf[..(message_length as usize)];
 
-            self.link
-                .read_exact(buf)
-                .map_err(|e| RecvError::ReadError(e))?;
+            self.link.read(buf).map_err(|e| RecvError::ReadError(e))?;
         }
 
         buf.iter_mut().for_each(|i| *i = i.to_le());

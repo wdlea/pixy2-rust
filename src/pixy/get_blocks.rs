@@ -1,7 +1,8 @@
 use core::ptr::slice_from_raw_parts;
 
 use embedded_hal::delay::DelayNs;
-use embedded_io::{Read, ReadReady, Write};
+
+use crate::link_type::LinkType;
 
 use super::{Pixy2, operation_error::OperationError};
 
@@ -36,7 +37,7 @@ pub struct Block {
     age: u8,
 }
 
-impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+impl<Link: LinkType> Pixy2<Link> {
     /// Get an array of blocks with the given `signature_bitmap`.
     /// It can either return immediately with [OperationError::Busy]
     /// if no blocks are found, or `wait`. Returns at most

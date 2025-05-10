@@ -1,13 +1,11 @@
-use embedded_io::{Read, ReadReady, Write};
-
-use crate::version::Version;
+use crate::{link_type::LinkType, version::Version};
 
 use super::{Pixy2, operation_error::OperationError};
 
 pub const REQUEST_PIXY_VERSION: u8 = 0x0e;
 pub const RESPONSE_PIXY_VERSION: u8 = 0x0f;
 
-impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+impl<Link: LinkType> Pixy2<Link> {
     /// Requests the camera's version.
     pub fn get_version(&mut self) -> Result<&Version, OperationError<Link>> {
         self.send_packet(REQUEST_PIXY_VERSION, &[])

@@ -1,8 +1,7 @@
 use embedded_hal::delay::DelayNs;
-use embedded_io::{Read, ReadReady, Write};
 use embedded_time::{Clock, duration::Milliseconds};
 
-use crate::version::Version;
+use crate::{link_type::LinkType, version::Version};
 
 mod change_program;
 mod get_blocks;
@@ -30,7 +29,7 @@ pub struct Pixy2<Link> {
     buf: [u8; 256],
 }
 
-impl<Link: Write + Read + ReadReady> Pixy2<Link> {
+impl<Link: LinkType> Pixy2<Link> {
     /// Create an initialize a Pixy2 object.
     pub fn new(
         link: Link,
