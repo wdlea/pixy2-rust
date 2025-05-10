@@ -16,25 +16,25 @@ const RESPONSE_ERROR_PROG_CHANGING: i8 = -6;
 #[repr(C)]
 pub struct Block {
     /// The signature of this block
-    signature: u16,
+    pub signature: u16,
 
     /// The x coordinate of this block on the camera.
-    x: u16,
+    pub x: u16,
     /// The y coordinate of this block on the camera.
-    y: u16,
+    pub y: u16,
 
     /// The width of this block (in pixels).
-    width: u16,
+    pub width: u16,
     /// The height of this block (in pixels).
-    height: u16,
+    pub height: u16,
 
     /// The angle of this block relative to the camera.
-    angle: i16,
+    pub angle: i16,
     /// The tracking index of this block.
-    index: u8,
+    pub index: u8,
     /// How long has this been tracked for, in frames.
     /// Stops incrementing at 255.
-    age: u8,
+    pub age: u8,
 }
 
 impl<Link: LinkType> Pixy2<Link> {
