@@ -6,6 +6,7 @@ use crate::link_type::LinkType;
 use super::recv_packet::RecvError;
 
 /// Errors which can arise from any operation
+#[derive(Debug)]
 pub enum OperationError<Link: LinkType> {
     /// An error raised while sending a packet
     SendError(Link::WriteError),

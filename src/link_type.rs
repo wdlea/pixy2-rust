@@ -1,11 +1,13 @@
+use core::fmt::Debug;
+
 use embedded_hal::spi::{ErrorType, SpiDevice};
 
 /// Something that can be used to communicate with Pixy2
 pub trait LinkType {
     /// An error type that may be thrown by read
-    type ReadError;
+    type ReadError: Debug;
     /// An error type that may be thrown by write
-    type WriteError;
+    type WriteError: Debug;
 
     /// Write bytes to the Pixy2 camera
     fn write(&mut self, buf: &[u8]) -> Result<(), Self::WriteError>;

@@ -2,6 +2,7 @@ use crate::link_type::LinkType;
 
 use super::{Pixy2, get_sync::SyncError};
 
+#[derive(Debug)]
 pub enum RecvError<Link: LinkType> {
     SyncError(SyncError<Link>),
     ReadError(Link::ReadError),
