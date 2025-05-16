@@ -49,7 +49,7 @@ impl<Link: LinkType> Pixy2<Link> {
 
             let current = buf[0] as u16;
 
-            let start: u16 = (current << 8) | (prev as u16);
+            let start: u16 = (current) | ((prev as u16) << 8);
             if start == PIXY_CHECKSUM_SYNC {
                 self.using_checksums = false;
                 return Ok(());
