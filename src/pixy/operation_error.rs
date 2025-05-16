@@ -2,12 +2,13 @@ use core::fmt::Debug;
 
 use embedded_io::SliceWriteError;
 use embedded_time::clock;
+use ufmt::uDebug;
 
 use crate::link_type::LinkType;
 
 use super::recv_packet::RecvError;
 
-/// Errors which can arise from any operation
+/// Errors which can arise from any operation]
 pub enum OperationError<Link: LinkType> {
     /// An error raised while sending a packet
     SendError(Link::WriteError),
@@ -50,6 +51,27 @@ impl<Link: LinkType> Debug for OperationError<Link> {
             Self::PixyError(arg0) => f.debug_tuple("PixyError").field(arg0).finish(),
             Self::Timeout => write!(f, "Timeout"),
             Self::Busy => write!(f, "Busy"),
+        }
+    }
+}
+
+impl<Link: LinkType> uDebug for OperationError<Link> {
+    fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
+    where
+        W: ufmt::uWrite + ?Sized,
+    {
+        match self {
+            OperationError::SendError(_) => f.write_str("Send Error"),
+            OperationError::RecvError(_) => f.write_str("Receive Error"),
+            OperationError::UnexpectedPacket {
+                got: _,
+                expected: _,
+            } => f.write_str("Unexpected Packet"),
+            OperationError::ClockError(_) => f.write_str("Clock Error"),
+            OperationError::IOError(_) => f.write_str("IO Error"),
+            OperationError::PixyError(_) => f.write_str("Pixy Error"),
+            OperationError::Timeout => f.write_str("Timeout"),
+            OperationError::Busy => f.write_str("Pixy is Busy"),
         }
     }
 }
