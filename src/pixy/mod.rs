@@ -1,4 +1,5 @@
 use embedded_hal::delay::DelayNs;
+use ufmt::{uWrite, uwriteln};
 
 use crate::{link_type::LinkType, version::Version};
 
@@ -30,7 +31,11 @@ pub struct Pixy2<Link> {
 
 impl<Link: LinkType> Pixy2<Link> {
     /// Create an initialize a Pixy2 object.
-    pub fn new(link: Link, waiter: &mut impl DelayNs) -> Result<Self, OperationError<Link>> {
+    pub fn new(
+        link: Link,
+        waiter: &mut impl DelayNs,
+        dbg: &mut impl uWrite,
+    ) -> Result<Self, OperationError<Link>> {
         let mut me = Self {
             version: None,
             frame_width: None,
@@ -43,10 +48,17 @@ impl<Link: LinkType> Pixy2<Link> {
 
         while i < 1000 {
             // delay for at most 5_000_000 us (5 seconds)
-            if me.get_version().is_ok() {
-                me.get_resolution()?;
-                return Ok(me);
+
+            match me.get_version() {
+                Ok(_) => {
+                    me.get_resolution()?;
+                    return Ok(me);
+                }
+                Err(e) => {
+                    _ = uwriteln!(dbg, "{:?}", e);
+                }
             }
+
             waiter.delay_us(5_000);
             i += 1;
         }
