@@ -1,5 +1,7 @@
 use core::fmt::Debug;
 
+use ufmt::{uDebug, uwriteln};
+
 use crate::link_type::LinkType;
 
 use super::{Pixy2, get_sync::SyncError};
@@ -8,6 +10,22 @@ pub enum RecvError<Link: LinkType> {
     SyncError(SyncError<Link>),
     ReadError(Link::ReadError),
     InvalidChecksum,
+}
+
+impl<Link: LinkType> uDebug for RecvError<Link> {
+    fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
+    where
+        W: ufmt::uWrite + ?Sized,
+    {
+        match self {
+            RecvError::SyncError(sync_error) => {
+                uwriteln!(f, "Failed to get sync: {:?}", sync_error)
+            }
+
+            RecvError::ReadError(_) => uwriteln!(f, "Failed to read"),
+            RecvError::InvalidChecksum => uwriteln!(f, "Invalid Checksum"),
+        }
+    }
 }
 
 impl<Link: LinkType> Debug for RecvError<Link> {

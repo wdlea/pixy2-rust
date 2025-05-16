@@ -2,7 +2,7 @@ use core::fmt::Debug;
 
 use embedded_io::SliceWriteError;
 use embedded_time::clock;
-use ufmt::uDebug;
+use ufmt::{uDebug, uwriteln};
 
 use crate::link_type::LinkType;
 
@@ -61,8 +61,8 @@ impl<Link: LinkType> uDebug for OperationError<Link> {
         W: ufmt::uWrite + ?Sized,
     {
         match self {
-            OperationError::SendError(_) => f.write_str("Send Error"),
-            OperationError::RecvError(_) => f.write_str("Receive Error"),
+            OperationError::SendError(_) => uwriteln!(f, "Send Error"),
+            OperationError::RecvError(err) => uwriteln!(f, "Receive Error: {:?}", err),
             OperationError::UnexpectedPacket {
                 got: _,
                 expected: _,

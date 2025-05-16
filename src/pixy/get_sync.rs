@@ -1,5 +1,7 @@
 use core::fmt::Debug;
 
+use ufmt::{uDebug, uwriteln};
+
 use crate::link_type::LinkType;
 
 use super::Pixy2;
@@ -10,6 +12,18 @@ pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 pub enum SyncError<Link: LinkType> {
     NoSync,
     ReadError(Link::ReadError),
+}
+
+impl<Link: LinkType> uDebug for SyncError<Link> {
+    fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
+    where
+        W: ufmt::uWrite + ?Sized,
+    {
+        match self {
+            SyncError::NoSync => uwriteln!(f, "No Sync Found"),
+            SyncError::ReadError(_) => uwriteln!(f, "Could not read for sync."),
+        }
+    }
 }
 
 impl<Link: LinkType> Debug for SyncError<Link> {
