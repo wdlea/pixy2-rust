@@ -2,8 +2,6 @@ use core::ptr::slice_from_raw_parts;
 
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
-
-
 use super::{Pixy2, operation_error::OperationError};
 
 const REQUEST_BLOCKS: u8 = 0x20;

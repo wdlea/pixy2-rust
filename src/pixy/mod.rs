@@ -3,7 +3,6 @@ use ufmt::{uWrite, uwriteln};
 
 use crate::version::Version;
 
-mod change_program;
 mod get_blocks;
 mod get_resolution;
 mod get_sync;

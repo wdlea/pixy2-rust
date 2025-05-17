@@ -1,8 +1,6 @@
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use ufmt::{uDebug, uwriteln};
 
-
-
 use super::Pixy2;
 
 const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;

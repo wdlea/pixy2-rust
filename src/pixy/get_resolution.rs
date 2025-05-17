@@ -1,7 +1,5 @@
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
-
-
 use super::{Pixy2, operation_error::OperationError};
 
 const REQUEST_PIXY_RESOLOUTION: u8 = 0x0c;

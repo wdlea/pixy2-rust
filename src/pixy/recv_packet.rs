@@ -1,8 +1,6 @@
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use ufmt::{uDebug, uwriteln};
 
-
-
 use super::{Pixy2, get_sync::SyncError};
 
 pub enum RecvError<Link: SpiDevice> {

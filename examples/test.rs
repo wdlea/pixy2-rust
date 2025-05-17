@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::{delay_ms, spi::Settings, Delay, Spi};
+use arduino_hal::{Delay, Spi, delay_ms, spi::Settings};
 use embedded_hal::spi::MODE_3;
 use panic_halt as _;
 use pixy2_rust::pixy::{OperationError, Pixy2};
