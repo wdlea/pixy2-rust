@@ -1,5 +1,4 @@
-use core::fmt::Debug;
-
+use embedded_hal::delay::DelayNs;
 use ufmt::{uDebug, uwriteln};
 
 use crate::link_type::LinkType;
@@ -12,6 +11,7 @@ pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 pub enum SyncError<Link: LinkType> {
     NoSync,
     ReadError(Link::ReadError),
+    Other(u8),
 }
 
 impl<Link: LinkType> uDebug for SyncError<Link> {
@@ -22,47 +22,45 @@ impl<Link: LinkType> uDebug for SyncError<Link> {
         match self {
             SyncError::NoSync => uwriteln!(f, "No Sync Found"),
             SyncError::ReadError(_) => uwriteln!(f, "Could not read for sync."),
+            SyncError::Other(msg) => uwriteln!(f, "Other Error: {}", msg),
         }
     }
 }
 
-impl<Link: LinkType> Debug for SyncError<Link> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NoSync => write!(f, "NoSync"),
-            Self::ReadError(arg0) => f.debug_tuple("ReadError").field(arg0).finish(),
-        }
-    }
-}
-
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Waits until a sync sequence is received from the camera.
     pub fn get_sync(&mut self) -> Result<(), SyncError<Link>> {
-        let mut prev = 0u8;
-        let mut i = 0;
+        let [mut i, mut j, mut cprev] = [0u8; 3];
+        let mut start: u16;
+
+        // i = 0, and j = 0
         loop {
-            let mut buf = [0u8];
+            let buf = &mut self.buf[0..1];
+            self.link.read(buf).map_err(|e| SyncError::ReadError(e))?;
+            let c = buf[0];
 
-            self.link
-                .read(buf.as_mut_slice())
-                .map_err(|e| SyncError::ReadError(e))?;
+            start = cprev as u16; // assuming little-endian system
+            start |= (c as u16) << 8;
+            cprev = c;
 
-            let current = buf[0] as u16;
-
-            let start: u16 = (current) | ((prev as u16) << 8);
             if start == PIXY_CHECKSUM_SYNC {
-                self.using_checksums = false;
-                return Ok(());
-            } else if start == PIXY_NO_CHECKSUM_SYNC {
                 self.using_checksums = true;
                 return Ok(());
+            } else if start == PIXY_NO_CHECKSUM_SYNC {
+                self.using_checksums = false;
+                return Ok(());
             }
 
-            prev = current as u8;
+            if i >= 4 {
+                if j >= 4 {
+                    return Err(SyncError::NoSync);
+                }
+                j += 1;
+                i = 0;
 
-            if i > 128 {
-                return Err(SyncError::NoSync);
+                self.waiter.delay_us(25);
             }
+
             i += 1;
         }
     }

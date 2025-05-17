@@ -1,8 +1,10 @@
+use embedded_hal::delay::DelayNs;
+
 use crate::link_type::LinkType;
 
 use super::{Pixy2, get_sync::PIXY_NO_CHECKSUM_SYNC};
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Send a packed with a type and a payload.
     /// This uses the length of the slice for message
     /// length.

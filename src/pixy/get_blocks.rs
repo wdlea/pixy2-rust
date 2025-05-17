@@ -37,7 +37,7 @@ pub struct Block {
     pub age: u8,
 }
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Get an array of blocks with the given `signature_bitmap`.
     /// It can either return immediately with [OperationError::Busy]
     /// if no blocks are found, or `wait`. Returns at most

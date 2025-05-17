@@ -1,3 +1,5 @@
+use embedded_hal::delay::DelayNs;
+
 use crate::link_type::LinkType;
 
 use super::{Pixy2, operation_error::OperationError};
@@ -5,7 +7,7 @@ use super::{Pixy2, operation_error::OperationError};
 const REQUEST_PIXY_RESOLOUTION: u8 = 0x0c;
 const RESPONSE_PIXY_RESOLOUTION: u8 = 0x0d;
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Returns the resolution of the camera in pixels.
     pub fn get_resolution(&mut self) -> Result<(u16, u16), OperationError<Link>> {
         self.send_packet(REQUEST_PIXY_RESOLOUTION, &[0])

@@ -16,7 +16,7 @@ pub use get_blocks::Block;
 pub use operation_error::OperationError;
 
 /// Represents a Pixy2 camera
-pub struct Pixy2<Link> {
+pub struct Pixy2<Link, W> {
     /// The version of this camera, if it has been fetched
     pub version: Option<Version>,
     /// The width (in pixels) of the camera
@@ -27,15 +27,12 @@ pub struct Pixy2<Link> {
     link: Link,
     using_checksums: bool,
     buf: [u8; 256],
+    waiter: W,
 }
 
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Create an initialize a Pixy2 object.
-    pub fn new(
-        link: Link,
-        waiter: &mut impl DelayNs,
-        dbg: &mut impl uWrite,
-    ) -> Result<Self, OperationError<Link>> {
+    pub fn new(link: Link, waiter: W, dbg: &mut impl uWrite) -> Result<Self, OperationError<Link>> {
         let mut me = Self {
             version: None,
             frame_width: None,
@@ -43,6 +40,7 @@ impl<Link: LinkType> Pixy2<Link> {
             link,
             using_checksums: false,
             buf: [0; 256],
+            waiter,
         };
         let mut i = 0;
 
@@ -59,7 +57,7 @@ impl<Link: LinkType> Pixy2<Link> {
                 }
             }
 
-            waiter.delay_us(5_000);
+            me.waiter.delay_us(5_000);
             i += 1;
         }
 

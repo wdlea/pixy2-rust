@@ -1,5 +1,4 @@
-use core::fmt::Debug;
-
+use embedded_hal::delay::DelayNs;
 use ufmt::{uDebug, uwriteln};
 
 use crate::link_type::LinkType;
@@ -28,17 +27,7 @@ impl<Link: LinkType> uDebug for RecvError<Link> {
     }
 }
 
-impl<Link: LinkType> Debug for RecvError<Link> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::SyncError(arg0) => f.debug_tuple("SyncError").field(arg0).finish(),
-            Self::ReadError(arg0) => f.debug_tuple("ReadError").field(arg0).finish(),
-            Self::InvalidChecksum => write!(f, "InvalidChecksum"),
-        }
-    }
-}
-
-impl<Link: LinkType> Pixy2<Link> {
+impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
     /// Receive the next packet that the camera sends
     pub fn recv_packet(&mut self) -> Result<(u8, &mut [u8]), RecvError<Link>> {
         self.get_sync().map_err(|e| RecvError::SyncError(e))?;
