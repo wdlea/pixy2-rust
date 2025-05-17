@@ -1,13 +1,13 @@
-use embedded_hal::delay::DelayNs;
+use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
-use crate::{link_type::LinkType, version::Version};
+use crate::version::Version;
 
 use super::{Pixy2, operation_error::OperationError};
 
 pub const REQUEST_PIXY_VERSION: u8 = 0x0e;
 pub const RESPONSE_PIXY_VERSION: u8 = 0x0f;
 
-impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
+impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Requests the camera's version.
     pub fn get_version(&mut self) -> Result<&Version, OperationError<Link>> {
         self.send_packet(REQUEST_PIXY_VERSION, &[])

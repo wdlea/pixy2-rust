@@ -1,15 +1,14 @@
+use embedded_hal::spi::SpiDevice;
 use embedded_io::SliceWriteError;
 use embedded_time::clock;
 use ufmt::{uDebug, uwriteln};
 
-use crate::link_type::LinkType;
-
 use super::recv_packet::RecvError;
 
 /// Errors which can arise from any operation]
-pub enum OperationError<Link: LinkType> {
+pub enum OperationError<Link: SpiDevice> {
     /// An error raised while sending a packet
-    SendError(Link::WriteError),
+    SendError(Link::Error),
     /// An error raised when receiving a packet
     RecvError(RecvError<Link>),
 
@@ -34,7 +33,7 @@ pub enum OperationError<Link: LinkType> {
     Busy,
 }
 
-impl<Link: LinkType> uDebug for OperationError<Link> {
+impl<Link: SpiDevice> uDebug for OperationError<Link> {
     fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
     where
         W: ufmt::uWrite + ?Sized,

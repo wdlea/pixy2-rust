@@ -1,20 +1,20 @@
-use embedded_hal::delay::DelayNs;
+use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use ufmt::{uDebug, uwriteln};
 
-use crate::link_type::LinkType;
+
 
 use super::Pixy2;
 
 const PIXY_CHECKSUM_SYNC: u16 = 0xc1af_u16;
 pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 
-pub enum SyncError<Link: LinkType> {
+pub enum SyncError<Link: SpiDevice> {
     NoSync,
-    ReadError(Link::ReadError),
+    ReadError(Link::Error),
     Other(u8),
 }
 
-impl<Link: LinkType> uDebug for SyncError<Link> {
+impl<Link: SpiDevice> uDebug for SyncError<Link> {
     fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
     where
         W: ufmt::uWrite + ?Sized,
@@ -27,7 +27,7 @@ impl<Link: LinkType> uDebug for SyncError<Link> {
     }
 }
 
-impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
+impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Waits until a sync sequence is received from the camera.
     pub fn get_sync(&mut self) -> Result<(), SyncError<Link>> {
         let [mut i, mut j, mut cprev] = [0u8; 3];

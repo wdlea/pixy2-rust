@@ -1,17 +1,17 @@
-use embedded_hal::delay::DelayNs;
+use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use ufmt::{uDebug, uwriteln};
 
-use crate::link_type::LinkType;
+
 
 use super::{Pixy2, get_sync::SyncError};
 
-pub enum RecvError<Link: LinkType> {
+pub enum RecvError<Link: SpiDevice> {
     SyncError(SyncError<Link>),
-    ReadError(Link::ReadError),
+    ReadError(Link::Error),
     InvalidChecksum,
 }
 
-impl<Link: LinkType> uDebug for RecvError<Link> {
+impl<Link: SpiDevice> uDebug for RecvError<Link> {
     fn fmt<W>(&self, f: &mut ufmt::Formatter<'_, W>) -> Result<(), W::Error>
     where
         W: ufmt::uWrite + ?Sized,
@@ -27,7 +27,7 @@ impl<Link: LinkType> uDebug for RecvError<Link> {
     }
 }
 
-impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
+impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Receive the next packet that the camera sends
     pub fn recv_packet(&mut self) -> Result<(u8, &mut [u8]), RecvError<Link>> {
         self.get_sync().map_err(|e| RecvError::SyncError(e))?;

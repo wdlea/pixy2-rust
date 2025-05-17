@@ -1,7 +1,7 @@
 use embedded_hal::spi::{ErrorType, SpiDevice};
 
 /// Something that can be used to communicate with Pixy2
-pub trait LinkType {
+pub trait SpiDevice {
     /// An error type that may be thrown by read
     type ReadError;
     /// An error type that may be thrown by write
@@ -14,7 +14,7 @@ pub trait LinkType {
     fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::ReadError>;
 }
 
-impl<T: SpiDevice + ErrorType> LinkType for T {
+impl<T: SpiDevice + ErrorType> SpiDevice for T {
     type ReadError = T::Error;
     type WriteError = T::Error;
 

@@ -1,7 +1,7 @@
-use embedded_hal::delay::DelayNs;
+use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use ufmt::{uWrite, uwriteln};
 
-use crate::{link_type::LinkType, version::Version};
+use crate::version::Version;
 
 mod change_program;
 mod get_blocks;
@@ -30,7 +30,7 @@ pub struct Pixy2<Link, W> {
     waiter: W,
 }
 
-impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
+impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Create an initialize a Pixy2 object.
     pub fn new(link: Link, waiter: W, dbg: &mut impl uWrite) -> Result<Self, OperationError<Link>> {
         let mut me = Self {

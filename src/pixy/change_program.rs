@@ -1,14 +1,14 @@
-use embedded_hal::delay::DelayNs;
+use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 use embedded_io::Write;
 
-use crate::link_type::LinkType;
+
 
 use super::{Pixy2, operation_error::OperationError};
 
 const REQUEST_CHANGE_PROGRAM: u8 = 0x02;
 const MAX_PROGRAM_NAME_LENGTH: u8 = 33;
 
-impl<Link: LinkType, W: DelayNs> Pixy2<Link, W> {
+impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Changes the program currently running on pixycam.
     /// I ported this not knowing what it does, there are
     /// no docs explaining what strings you should feed

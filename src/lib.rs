@@ -9,6 +9,3 @@ pub mod pixy;
 
 /// The [version::Version] type, which represents a PixyCam Version
 pub mod version;
-
-/// Implements LinkType, which is something that Pixy2 can be communicated over
-pub mod link_type;
