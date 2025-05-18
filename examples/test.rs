@@ -61,7 +61,10 @@ fn main() -> ! {
             Err(OperationError::Busy) => {
                 delay_ms(200); // just try again after a delay
             }
-            Err(_) => panic!("Error getting blocks"),
+            Err(e) => {
+                uwriteln!(serial, "Oopsie: {:?}", e);
+                panic!("Error getting blocks");
+            }
         }
 
         delay_ms(10); // small delay to give PixyCam time to do other things
