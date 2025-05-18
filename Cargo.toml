@@ -2,7 +2,7 @@
 name = "pixy2_rust"
 version = "0.1.0"
 edition = "2024"
-license = "GPL-1.0-only"
+license = "GPL-2.0-only"
 description = "An unofficial port of TPixy2.h and Pixy2CCC.h to Rust."
 
 [dependencies]
