@@ -31,7 +31,7 @@ fn main() -> ! {
     let dev = embedded_hal_bus::spi::ExclusiveDevice::new(spi, cs, Delay::new()).unwrap();
     uwriteln!(serial, "Got SPI device.").unwrap();
 
-    let mut pixy = Pixy2::new(dev, arduino_hal::Delay::new(), &mut serial).unwrap_or_else(|e| {
+    let mut pixy = Pixy2::new(dev, arduino_hal::Delay::new()).unwrap_or_else(|e| {
         uwriteln!(serial, "Error connecting to pixy: {:?}", e);
         panic!("")
     });

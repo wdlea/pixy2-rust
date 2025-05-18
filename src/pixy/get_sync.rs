@@ -9,7 +9,6 @@ pub const PIXY_NO_CHECKSUM_SYNC: u16 = 0xc1ae_u16;
 pub enum SyncError<Link: SpiDevice> {
     NoSync,
     ReadError(Link::Error),
-    Other(u8),
 }
 
 impl<Link: SpiDevice> uDebug for SyncError<Link> {
@@ -20,7 +19,6 @@ impl<Link: SpiDevice> uDebug for SyncError<Link> {
         match self {
             SyncError::NoSync => uwriteln!(f, "No Sync Found"),
             SyncError::ReadError(_) => uwriteln!(f, "Could not read for sync."),
-            SyncError::Other(msg) => uwriteln!(f, "Other Error: {}", msg),
         }
     }
 }
@@ -28,7 +26,7 @@ impl<Link: SpiDevice> uDebug for SyncError<Link> {
 impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Waits until a sync sequence is received from the camera.
     pub fn get_sync(&mut self) -> Result<(), SyncError<Link>> {
-        let [mut i, mut j, mut cprev] = [0u8; 3];
+        let [mut i, mut j, mut previous] = [0u8; 3];
         let mut start: u16;
 
         // i = 0, and j = 0
@@ -37,9 +35,9 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
             self.link.read(buf).map_err(|e| SyncError::ReadError(e))?;
             let c = buf[0];
 
-            start = cprev as u16; // assuming little-endian system
+            start = previous as u16; // assuming little-endian system
             start |= (c as u16) << 8;
-            cprev = c;
+            previous = c;
 
             if start == PIXY_CHECKSUM_SYNC {
                 self.using_checksums = true;

@@ -1,10 +1,13 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::{spi::{DataOrder, Settings}, Delay, Spi};
+use arduino_hal::{
+    Delay, Spi,
+    spi::{DataOrder, Settings},
+};
 use embedded_hal::{
     digital::OutputPin,
-    spi::{Mode, Phase, Polarity, SpiDevice, MODE_1, MODE_3},
+    spi::{MODE_1, MODE_3, Mode, Phase, Polarity, SpiDevice},
 };
 use panic_halt as _;
 use ufmt::uwriteln;
@@ -23,7 +26,7 @@ fn main() -> ! {
         pins.d50.into_pull_up_input(),
         pins.d53.into_output(),
         Settings {
-            mode: Mode{
+            mode: Mode {
                 polarity: Polarity::IdleLow,
                 phase: Phase::CaptureOnSecondTransition,
             },

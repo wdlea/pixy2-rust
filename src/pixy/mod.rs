@@ -8,6 +8,7 @@ mod get_resolution;
 mod get_sync;
 mod get_version;
 mod operation_error;
+mod pixy_type;
 mod recv_packet;
 mod send_packet;
 
@@ -31,7 +32,7 @@ pub struct Pixy2<Link, W> {
 
 impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Create an initialize a Pixy2 object.
-    pub fn new(link: Link, waiter: W, dbg: &mut impl uWrite) -> Result<Self, OperationError<Link>> {
+    pub fn new(link: Link, waiter: W) -> Result<Self, OperationError<Link>> {
         let mut me = Self {
             version: None,
             frame_width: None,
@@ -51,9 +52,7 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
                     me.get_resolution()?;
                     return Ok(me);
                 }
-                Err(e) => {
-                    _ = uwriteln!(dbg, "{:?}", e);
-                }
+                Err(_) => (),
             }
 
             me.waiter.delay_us(5_000);

@@ -1,24 +1,21 @@
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
-use super::{Pixy2, operation_error::OperationError};
-
-const REQUEST_PIXY_RESOLOUTION: u8 = 0x0c;
-const RESPONSE_PIXY_RESOLOUTION: u8 = 0x0d;
+use super::{Pixy2, operation_error::OperationError, pixy_type::PacketType};
 
 impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Returns the resolution of the camera in pixels.
     pub fn get_resolution(&mut self) -> Result<(u16, u16), OperationError<Link>> {
-        self.send_packet(REQUEST_PIXY_RESOLOUTION, &[0])
+        self.send_packet(PacketType::RequestResolution, &[0])
             .map_err(|e| OperationError::SendError(e))?;
 
         let (resp_type, resp_payload) = self
             .recv_packet()
             .map_err(|e| OperationError::RecvError(e))?;
 
-        if resp_type != RESPONSE_PIXY_RESOLOUTION {
+        if !matches!(resp_type, PacketType::ResponseResolution) {
             return Err(OperationError::UnexpectedPacket {
                 got: resp_type,
-                expected: RESPONSE_PIXY_RESOLOUTION,
+                expected: PacketType::RequestResolution,
             });
         }
 

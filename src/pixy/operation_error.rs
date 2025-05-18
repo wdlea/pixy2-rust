@@ -3,7 +3,10 @@ use embedded_io::SliceWriteError;
 use embedded_time::clock;
 use ufmt::{uDebug, uwriteln};
 
-use super::recv_packet::RecvError;
+use super::{
+    pixy_type::{PacketType, PixyResultType},
+    recv_packet::RecvError,
+};
 
 /// Errors which can arise from any operation]
 pub enum OperationError<Link: SpiDevice> {
@@ -15,9 +18,9 @@ pub enum OperationError<Link: SpiDevice> {
     /// An unexpected packet was received
     UnexpectedPacket {
         /// What the type of the received packet was
-        got: u8,
+        got: PacketType,
         /// What was expected. There may be more valid packets to receive.
-        expected: u8,
+        expected: PacketType,
     },
     /// An error occurred in [embedded_time::clock]
     ClockError(clock::Error),
@@ -25,7 +28,7 @@ pub enum OperationError<Link: SpiDevice> {
     IOError(SliceWriteError),
 
     /// An error occurred from the Pixy2
-    PixyError(i8),
+    PixyError(PixyResultType),
 
     /// The Pixy2 camera could not be reached
     Timeout,

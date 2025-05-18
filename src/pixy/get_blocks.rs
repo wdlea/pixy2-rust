@@ -2,14 +2,11 @@ use core::ptr::slice_from_raw_parts;
 
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
-use super::{Pixy2, operation_error::OperationError};
-
-const REQUEST_BLOCKS: u8 = 0x20;
-const RESPONSE_BLOCKS: u8 = 0x21;
-const RESPONSE_ERROR: u8 = 0x03;
-const RESPONSE_ERROR_BUSY: i8 = -2;
-const RESPONSE_ERROR_PROG_CHANGING: i8 = -6;
-const RESPONSE_ERROR_OK: i8 = 0;
+use super::{
+    Pixy2,
+    operation_error::OperationError,
+    pixy_type::{PacketType, PixyResultType},
+};
 
 /// Represents a region of colour tracked by PixyCam.
 #[repr(C)]
@@ -49,7 +46,7 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
         waiter: &mut impl DelayNs,
     ) -> Result<&[Block], OperationError<Link>> {
         loop {
-            self.send_packet(REQUEST_BLOCKS, &[signature_bitmap, max_blocks])
+            self.send_packet(PacketType::RequestBlocks, &[signature_bitmap, max_blocks])
                 .map_err(|e| OperationError::SendError(e))?;
 
             let (resp_type, resp_payload) = self
@@ -57,7 +54,7 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
                 .map_err(|e| OperationError::RecvError(e))?;
 
             match resp_type {
-                RESPONSE_BLOCKS => {
+                PacketType::ResponseBlocks => {
                     let slice = unsafe {
                         slice_from_raw_parts(
                             resp_payload.as_ptr().cast::<Block>(),
@@ -69,23 +66,25 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
 
                     return Ok(slice);
                 }
-                RESPONSE_ERROR => {
-                    let reinterpreted_i8 = unsafe { *(resp_payload[0] as *const i8) };
+                PacketType::ResponseError => {
+                    let result: PixyResultType = unsafe { *(resp_payload[0] as *const i8) }.into();
 
-                    if reinterpreted_i8 == RESPONSE_ERROR_BUSY {
+                    if let PixyResultType::Busy = result {
                         if wait {
                             continue;
                         } else {
                             return Err(OperationError::Busy);
                         }
-                    } else if reinterpreted_i8 != RESPONSE_ERROR_PROG_CHANGING && reinterpreted_i8 != RESPONSE_ERROR_OK {
-                        return Err(OperationError::PixyError(reinterpreted_i8));
+                    } else if !matches!(result, PixyResultType::ProgramChanging)
+                        && !matches!(result, PixyResultType::Ok)
+                    {
+                        return Err(OperationError::PixyError(result));
                     }
                 }
                 _ => {
                     return Err(OperationError::UnexpectedPacket {
                         got: resp_type,
-                        expected: RESPONSE_BLOCKS,
+                        expected: PacketType::ResponseBlocks,
                     });
                 }
             }

@@ -2,25 +2,22 @@ use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
 use crate::version::Version;
 
-use super::{Pixy2, operation_error::OperationError};
-
-pub const REQUEST_PIXY_VERSION: u8 = 0x0e;
-pub const RESPONSE_PIXY_VERSION: u8 = 0x0f;
+use super::{Pixy2, operation_error::OperationError, pixy_type::PacketType};
 
 impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
     /// Requests the camera's version.
     pub fn get_version(&mut self) -> Result<&Version, OperationError<Link>> {
-        self.send_packet(REQUEST_PIXY_VERSION, &[])
+        self.send_packet(PacketType::RequestVersion, &[])
             .map_err(|e| OperationError::<Link>::SendError(e))?;
 
         let (resp_type, resp_payload) = self
             .recv_packet()
             .map_err(|e| OperationError::RecvError(e))?;
 
-        if resp_type != RESPONSE_PIXY_VERSION {
+        if !matches!(resp_type, PacketType::ResponseVersion) {
             return Err(OperationError::UnexpectedPacket {
                 got: resp_type,
-                expected: REQUEST_PIXY_VERSION,
+                expected: PacketType::ResponseVersion,
             });
         }
 
