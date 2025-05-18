@@ -1,5 +1,4 @@
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
-use ufmt::{uWrite, uwriteln};
 
 use crate::version::Version;
 

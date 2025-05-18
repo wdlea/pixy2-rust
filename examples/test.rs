@@ -32,7 +32,7 @@ fn main() -> ! {
     uwriteln!(serial, "Got SPI device.").unwrap();
 
     let mut pixy = Pixy2::new(dev, arduino_hal::Delay::new()).unwrap_or_else(|e| {
-        uwriteln!(serial, "Error connecting to pixy: {:?}", e);
+        uwriteln!(serial, "Error connecting to pixy: {:?}", e).unwrap();
         panic!("")
     });
 
@@ -62,7 +62,7 @@ fn main() -> ! {
                 delay_ms(200); // just try again after a delay
             }
             Err(e) => {
-                uwriteln!(serial, "Oopsie: {:?}", e);
+                uwriteln!(serial, "Oopsie: {:?}", e).unwrap();
                 panic!("Error getting blocks");
             }
         }
