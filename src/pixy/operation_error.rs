@@ -47,7 +47,7 @@ impl<Link: SpiDevice> uDebug for OperationError<Link> {
             } => f.write_str("Unexpected Packet"),
             OperationError::ClockError(_) => f.write_str("Clock Error"),
             OperationError::IOError(_) => f.write_str("IO Error"),
-            OperationError::PixyError(_) => f.write_str("Pixy Error"),
+            OperationError::PixyError(code) => uwriteln!(f, "Pixy Error: {}", code),
             OperationError::Timeout => f.write_str("Timeout"),
             OperationError::Busy => f.write_str("Pixy is Busy"),
         }

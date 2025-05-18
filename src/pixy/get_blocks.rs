@@ -9,6 +9,7 @@ const RESPONSE_BLOCKS: u8 = 0x21;
 const RESPONSE_ERROR: u8 = 0x03;
 const RESPONSE_ERROR_BUSY: i8 = -2;
 const RESPONSE_ERROR_PROG_CHANGING: i8 = -6;
+const RESPONSE_ERROR_OK: i8 = 0;
 
 /// Represents a region of colour tracked by PixyCam.
 #[repr(C)]
@@ -77,7 +78,7 @@ impl<Link: SpiDevice, W: DelayNs> Pixy2<Link, W> {
                         } else {
                             return Err(OperationError::Busy);
                         }
-                    } else if reinterpreted_i8 != RESPONSE_ERROR_PROG_CHANGING {
+                    } else if reinterpreted_i8 != RESPONSE_ERROR_PROG_CHANGING && reinterpreted_i8 != RESPONSE_ERROR_OK {
                         return Err(OperationError::PixyError(reinterpreted_i8));
                     }
                 }
