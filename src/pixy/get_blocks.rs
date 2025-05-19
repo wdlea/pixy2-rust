@@ -3,7 +3,7 @@ use super::{
     pixy_type::{PacketType, PixyResultType},
     Pixy2,
 };
-use core::mem::size_of_val;
+use core::mem::{size_of, size_of_val};
 use core::ptr::slice_from_raw_parts;
 use embedded_hal::{delay::DelayNs, spi::SpiDevice};
 
