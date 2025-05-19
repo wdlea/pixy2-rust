@@ -4,7 +4,7 @@
 use arduino_hal::{Delay, Spi, delay_ms, spi::Settings};
 use embedded_hal::spi::MODE_3;
 use panic_halt as _;
-use pixy2_rust::pixy::{OperationError, Pixy2};
+use pixy2_port::pixy::{OperationError, Pixy2};
 use ufmt::uwriteln;
 
 #[arduino_hal::entry]
